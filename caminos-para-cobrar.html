@@ -1,0 +1,1705 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Caminos para cobrar</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap"
+    />
+    <style>
+      /* Layout: una cuadrícula de seis caminos; al elegir uno se abre su ficha con ventajas, riesgos y cuándo conviene. */
+      :root {
+        --bg: #f6f3ec;
+        --card: #ffffff;
+        --ink: #16283b;
+        --mute: #4a5568;
+        --teal: #0f7b6c;
+        --orange: #c8551b;
+        --line: #ddd7c8;
+        --tint: #e7f2ef;
+        --font:
+          "DM Sans", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --bg: #14202e;
+          --card: #1d2c3d;
+          --ink: #ede9de;
+          --mute: #a9b4c2;
+          --teal: #3db8a6;
+          --orange: #ea8a55;
+          --line: #33465b;
+          --tint: #1a3a3b;
+          color-scheme: dark;
+        }
+      }
+
+      :root[data-theme="dark"] {
+        --bg: #14202e;
+        --card: #1d2c3d;
+        --ink: #ede9de;
+        --mute: #a9b4c2;
+        --teal: #3db8a6;
+        --orange: #ea8a55;
+        --line: #33465b;
+        --tint: #1a3a3b;
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--font);
+        font-size: 17px;
+        line-height: 1.5;
+        padding-inline: 20px;
+        padding-block: 32px 56px;
+      }
+
+      .wrap {
+        max-width: 1160px;
+        margin-inline: auto;
+      }
+
+      h1,
+      h2,
+      h3 {
+        text-wrap: balance;
+        line-height: 1.15;
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(28px, 4.4vw, 44px);
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .lead {
+        color: var(--mute);
+        margin: 12px 0 0;
+        max-width: 62ch;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+        gap: 20px;
+        margin-top: 32px;
+      }
+
+      .card {
+        all: unset;
+        box-sizing: border-box;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 22px 24px;
+        min-width: 0;
+        transition:
+          transform 0.15s,
+          border-color 0.15s;
+      }
+
+      .card:hover {
+        transform: translateY(-3px);
+        border-color: var(--teal);
+      }
+
+      .card:focus-visible,
+      .btn:focus-visible {
+        outline: 3px solid var(--orange);
+        outline-offset: 3px;
+      }
+
+      .card.rec {
+        border: 2px solid var(--teal);
+      }
+
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .tag {
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--orange);
+      }
+
+      .card h3 {
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--mute);
+        font-size: 16px;
+      }
+
+      .spacer {
+        flex: 1;
+      }
+
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+
+      .dots i {
+        width: 30px;
+        height: 8px;
+        border-radius: 4px;
+        background: var(--line);
+      }
+
+      .dots i.on {
+        background: var(--teal);
+      }
+
+      .lvl {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+        font-size: 15px;
+      }
+
+      .more {
+        color: var(--teal);
+        font-weight: 700;
+      }
+
+      .hint {
+        margin-top: 28px;
+        color: var(--mute);
+        font-size: 15px;
+      }
+
+      svg {
+        max-width: 100%;
+        flex: none;
+      }
+
+      .t {
+        fill: var(--teal);
+      }
+
+      .o {
+        fill: var(--orange);
+      }
+
+      .i {
+        fill: var(--ink);
+      }
+
+      .c {
+        fill: var(--card);
+      }
+
+      .l {
+        fill: var(--line);
+      }
+
+      .si {
+        stroke: var(--ink);
+      }
+
+      .sc {
+        stroke: var(--card);
+      }
+
+      /* detalle */
+      .bar {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+      }
+
+      .btn {
+        all: unset;
+        box-sizing: border-box;
+        cursor: pointer;
+        border: 1px solid var(--line);
+        background: var(--card);
+        border-radius: 999px;
+        padding: 8px 18px;
+        font-weight: 700;
+        font-size: 15px;
+      }
+
+      .btn:hover {
+        border-color: var(--teal);
+      }
+
+      .head {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 24px;
+        align-items: center;
+      }
+
+      .head svg {
+        width: 132px;
+        height: auto;
+      }
+
+      .head .tag {
+        margin-bottom: 6px;
+      }
+
+      .head h2 {
+        font-size: clamp(26px, 4vw, 40px);
+        font-weight: 700;
+      }
+
+      .head p {
+        margin: 8px 0 0;
+        color: var(--mute);
+        max-width: 60ch;
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 32px;
+        margin-top: 24px;
+        padding: 16px 20px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+      }
+
+      .meta div {
+        min-width: 0;
+      }
+
+      .meta small {
+        display: block;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--mute);
+        font-weight: 700;
+      }
+
+      .meta b {
+        font-size: 17px;
+      }
+
+      .cols {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .box {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 20px 22px;
+        min-width: 0;
+      }
+
+      .box h4 {
+        margin: 0 0 10px;
+        font-size: 15px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--teal);
+      }
+
+      .box.no h4 {
+        color: var(--orange);
+      }
+
+      .box p {
+        margin: 0;
+      }
+
+      .box ul {
+        margin: 0;
+        padding-left: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .say {
+        margin-top: 20px;
+        padding: 18px 22px;
+        background: var(--tint);
+        border-radius: 14px;
+      }
+
+      .say small {
+        display: block;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--teal);
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+
+      .foot {
+        margin-top: 28px;
+        color: var(--mute);
+        font-size: 14px;
+      }
+
+      .deepbar {
+        margin-top: 20px;
+      }
+
+      .deepbtn {
+        background: var(--teal);
+        color: var(--bg);
+        border-color: var(--teal);
+        padding: 10px 22px;
+        font-size: 16px;
+      }
+
+      .deepbtn:hover {
+        border-color: var(--teal);
+        filter: brightness(1.1);
+      }
+
+      #deep {
+        margin-top: 16px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px 22px;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .tab {
+        all: unset;
+        box-sizing: border-box;
+        cursor: pointer;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 7px 16px;
+        font-weight: 700;
+        font-size: 15px;
+      }
+
+      .tab:hover {
+        border-color: var(--teal);
+      }
+
+      .tab[aria-selected="true"] {
+        background: var(--ink);
+        color: var(--bg);
+        border-color: var(--ink);
+      }
+
+      .tab:focus-visible {
+        outline: 3px solid var(--orange);
+        outline-offset: 3px;
+      }
+
+      .terms {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+        gap: 16px 28px;
+        margin: 20px 0 0;
+      }
+
+      .terms div {
+        min-width: 0;
+      }
+
+      .terms dt {
+        font-weight: 700;
+        color: var(--teal);
+      }
+
+      .terms dd {
+        margin: 2px 0 0;
+        color: var(--mute);
+        font-size: 16px;
+      }
+
+      .steps {
+        list-style: none;
+        counter-reset: s;
+        margin: 20px 0 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .steps li {
+        counter-increment: s;
+        display: grid;
+        grid-template-columns: 28px 108px 1fr;
+        gap: 4px 12px;
+        align-items: baseline;
+      }
+
+      .steps li::before {
+        content: counter(s);
+        font-weight: 700;
+        color: var(--mute);
+        font-size: 15px;
+      }
+
+      .steps li > span:last-child {
+        min-width: 0;
+      }
+
+      .who {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--orange);
+      }
+
+      .notes {
+        margin-top: 20px;
+        padding: 14px 18px;
+        background: var(--tint);
+        border-radius: 12px;
+      }
+
+      .notes h5 {
+        margin: 0 0 8px;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--teal);
+      }
+
+      .notes ul {
+        margin: 0;
+        padding-left: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.88em;
+        background: var(--tint);
+        padding: 1px 6px;
+        border-radius: 5px;
+        overflow-wrap: anywhere;
+      }
+
+      .notes code {
+        background: var(--card);
+      }
+
+      @media (max-width: 560px) {
+        .steps li {
+          grid-template-columns: 28px 1fr;
+        }
+
+        .steps li > span:last-child {
+          grid-column: 2;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .head {
+          grid-template-columns: 1fr;
+        }
+
+        .head svg {
+          width: 110px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .card {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <section id="home">
+        <h1>6 caminos para cobrar</h1>
+        <p class="lead">
+          De rentar un local a ser tu propio banco. Toca un camino para ver cómo
+          funciona, quién carga con el riesgo y cuándo conviene.
+        </p>
+        <div class="grid" id="grid"></div>
+        <p class="hint">
+          Los puntos muestran cómo crecen la complejidad, la regulación y el
+          costo. Los caminos 2 y 3 son los recomendados para arrancar.
+        </p>
+      </section>
+      <section id="detail" hidden></section>
+      <p class="foot">
+        Referencia general para la fase 0. Requisitos, comisiones y
+        disponibilidad cambian: confírmalos con cada proveedor y con un abogado
+        fintech.
+      </p>
+    </div>
+
+    <script>
+      var IC = {
+        1: '<svg viewBox="0 0 88 72" width="88" height="72" role="img" aria-label="Local rentado con toldo"><rect x="14" y="30" width="60" height="36" rx="3" class="c si" stroke-width="3"/><path d="M10 30 L16 10 H72 L78 30 Z" class="o"/><path d="M28 30 L30 10 M44 30 V10 M60 30 L58 10" class="sc" stroke-width="4" fill="none"/><rect x="36" y="42" width="16" height="24" class="t"/><rect x="18" y="40" width="12" height="12" class="l"/><rect x="58" y="40" width="12" height="12" class="l"/></svg>',
+        2: '<svg viewBox="0 0 88 72" width="88" height="72" role="img" aria-label="Ventana de tu plataforma con moneda"><rect x="8" y="8" width="64" height="48" rx="6" class="c si" stroke-width="3"/><rect x="8" y="8" width="64" height="12" rx="6" class="i"/><circle cx="16" cy="14" r="2.5" class="c"/><circle cx="24" cy="14" r="2.5" class="c"/><rect x="16" y="28" width="30" height="6" rx="3" class="l"/><rect x="16" y="40" width="20" height="6" rx="3" class="l"/><circle cx="64" cy="52" r="15" class="t sc" stroke-width="3"/><path d="M58 52 L63 57 L71 46" fill="none" class="sc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        3: '<svg viewBox="0 0 88 72" width="88" height="72" role="img" aria-label="Centro con varios comercios conectados"><path d="M44 36 L18 16 M44 36 L70 16 M44 36 L44 62" class="si" fill="none" stroke-width="3"/><circle cx="44" cy="36" r="13" class="t"/><circle cx="44" cy="36" r="5" class="c"/><rect x="8" y="6" width="22" height="20" rx="3" class="o"/><rect x="58" y="6" width="22" height="20" rx="3" class="o"/><rect x="33" y="52" width="22" height="18" rx="3" class="o"/><path d="M8 6 H30 M58 6 H80 M33 52 H55" class="si" fill="none" stroke-width="3"/></svg>',
+        4: '<svg viewBox="0 0 88 72" width="88" height="72" role="img" aria-label="Banco con columnas"><path d="M8 26 L44 6 L80 26 Z" class="i"/><rect x="16" y="30" width="10" height="26" class="t"/><rect x="39" y="30" width="10" height="26" class="t"/><rect x="62" y="30" width="10" height="26" class="t"/><rect x="8" y="58" width="72" height="8" rx="2" class="i"/><circle cx="44" cy="19" r="4" class="c"/></svg>',
+        5: '<svg viewBox="0 0 88 72" width="88" height="72" role="img" aria-label="Tarjeta con chip y escudo"><rect x="6" y="14" width="64" height="42" rx="7" class="i"/><rect x="6" y="24" width="64" height="9" class="l"/><rect x="14" y="40" width="16" height="11" rx="2" class="o"/><path d="M64 34 L80 40 V52 C80 62 72 67 64 70 C56 67 48 62 48 52 V40 Z" class="t sc" stroke-width="3"/><path d="M57 52 L62 57 L71 47" fill="none" class="sc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        6: '<svg viewBox="0 0 88 72" width="88" height="72" role="img" aria-label="Sello oficial en un documento"><rect x="12" y="6" width="46" height="60" rx="4" class="c si" stroke-width="3"/><rect x="20" y="16" width="30" height="5" rx="2" class="l"/><rect x="20" y="27" width="30" height="5" rx="2" class="l"/><rect x="20" y="38" width="18" height="5" rx="2" class="l"/><path d="M62 30 l5 4 6-1 2 6 6 3-3 6 2 6-6 2-3 6-6-2-5 4-5-4-6 2-3-6-6-2 2-6-3-6 6-3 2-6 6 1z" class="o" transform="translate(-4 4) scale(.8)"/><path d="M56 50 L61 55 L70 44" fill="none" class="sc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+      };
+      var D = [
+        {
+          n: 1,
+          t: "Proveedor tal cual",
+          lvl: "Muy simple",
+          rec: 0,
+          s: "Mercado Pago, Conekta u Openpay con su marca. Como rentar un local con su letrero.",
+          what: "Abres una cuenta con el proveedor y cobras con sus links de pago, su checkout o su terminal. No construyes nada de cobro.",
+          flow: "Cliente → proveedor → cuenta del comercio.",
+          risk: "El proveedor tiene la licencia y cumple PCI. El comercio responde por contracargos según su contrato.",
+          pro: [
+            "Funcionando en horas o días",
+            "Cero desarrollo de cobro",
+            "Sin regulación propia",
+          ],
+          con: [
+            "El cliente ve la marca del proveedor",
+            "Comisión por cada transacción",
+            "Poco control: límites y retenciones los decide el proveedor",
+          ],
+          when: "Para validar rápido una idea o para comercios pequeños que solo necesitan cobrar.",
+          time: "Horas a días",
+          ex: "Mercado Pago, Conekta, Openpay",
+          say: "Es lo más rápido y barato, pero tu cliente ve la marca de otro.",
+        },
+        {
+          n: 2,
+          t: "Tu plataforma sobre un proveedor",
+          lvl: "Simple",
+          rec: 1,
+          s: "Tu API, checkout y panel. El proveedor mueve el dinero.",
+          what: "Tú construyes la API, el checkout con tu marca, el panel, el registro contable (ledger) y los webhooks. Por debajo, un proveedor procesa los pagos.",
+          flow: "Cliente → proveedor → cuenta de cada comercio. El dinero no pasa por ti.",
+          risk: "El proveedor lleva la licencia y PCI si usas su checkout alojado. Tú asumes términos de servicio y un KYC básico de tus comercios.",
+          pro: [
+            "Tu marca y tus reglas",
+            "Cobras suscripción o comisión por uso",
+            "Puedes cambiar de proveedor con una capa de abstracción",
+          ],
+          con: [
+            "Dependes del proveedor",
+            "Cada comercio suele necesitar su propia cuenta con él",
+            "Tú te encargas de conciliación y soporte",
+          ],
+          when: "Es el punto de partida recomendado para el MVP de la pasarela.",
+          time: "Varias semanas de trabajo en tiempo parcial",
+          ex: "Conekta u Openpay como motor, con tu API encima",
+          say: "Se siente como tu pasarela, pero el trabajo pesado lo hace un proveedor con licencia.",
+        },
+        {
+          n: 3,
+          t: "Marketplace con sub-comercios",
+          lvl: "Medio",
+          rec: 1,
+          s: "Cada comercio con su cuenta; el dinero se reparte solo.",
+          what: "Cada comercio de tus clientes es una subcuenta dentro del proveedor. El cobro se divide automáticamente y tu comisión sale incluida.",
+          flow: "Cliente → proveedor → reparto automático entre el comercio y tu comisión.",
+          risk: "El proveedor sigue cargando con la licencia. Tú tienes obligaciones contractuales: identificar comercios, fraude y contracargos.",
+          pro: [
+            "Reparto y comisión sin cálculos manuales",
+            "Alta de comercios más ordenada",
+            "Es lo más parecido a «como Stripe»",
+          ],
+          con: [
+            "Necesitas aprobación del proveedor como plataforma",
+            "La disponibilidad en México varía por proveedor",
+            "Sus políticas mandan sobre las tuyas",
+          ],
+          when: "Cuando ya tienes varios comercios y quieres que el dinero se reparta solo.",
+          time: "Semanas a un par de meses",
+          ex: "Stripe Connect y esquemas similares; confirma cuáles operan en México",
+          say: "Es un centro comercial: tú administras, cada local cobra a su nombre y el proveedor lleva las cuentas.",
+        },
+        {
+          n: 4,
+          t: "Cuentas bancarias como servicio",
+          lvl: "Medio-alto",
+          rec: 0,
+          s: "CLABEs por cliente con licencia de otro. Tú pones la experiencia.",
+          what: "Contratas a una empresa con licencia que te da CLABEs y movimiento de dinero por SPEI. Tú construyes la experiencia y la conciliación encima.",
+          flow: "Cliente → SPEI → CLABE asignada → conciliación automática en tu sistema.",
+          risk: "Recae más en ti: identificar clientes, prevención de lavado de dinero, seguridad (firmas, lista de IPs) y conciliación. Consulta a un abogado fintech.",
+          pro: [
+            "SPEI a costo bajo cuando hay volumen",
+            "Cada CLABE identifica quién pagó",
+            "Más control sobre el flujo del dinero",
+          ],
+          con: [
+            "Solo cubre SPEI, no tarjetas",
+            "Contrato y validación con el proveedor",
+            "Mucha más responsabilidad regulatoria",
+          ],
+          when: "Cuando el volumen de SPEI justifica bajar costos frente a un proveedor de cobro.",
+          time: "Meses",
+          ex: "STP, directo o mediante un agregador con CLABEs",
+          say: "Parece tu propio banco, pero la licencia es de otro.",
+        },
+        {
+          n: 5,
+          t: "Agregador con adquirente propio",
+          lvl: "Alto",
+          rec: 0,
+          s: "Conexión directa a Visa y Mastercard. Tú asumes PCI y contracargos.",
+          what: "Te conectas directo a un banco adquirente y a las redes de tarjetas, sin un proveedor de cobro en medio.",
+          flow: "Cliente → tu plataforma → adquirente → redes de tarjetas → banco del comercio.",
+          risk: "Todo el riesgo de tarjeta es tuyo: seguridad de datos (PCI DSS), fraude, contracargos y contratos con bancos.",
+          pro: [
+            "Mayor margen por transacción",
+            "Control total de la experiencia de tarjeta",
+          ],
+          con: [
+            "Certificación y auditoría PCI DSS",
+            "Contratos y requisitos bancarios exigentes",
+            "Absorbes fraude y contracargos",
+          ],
+          when: "Con un volumen de tarjeta alto que compense el costo y el riesgo.",
+          time: "Muchos meses",
+          ex: "Adquirentes bancarios como Prosa o Banorte",
+          say: "Es pasar de rentar a fabricar tu propia terminal.",
+        },
+        {
+          n: 6,
+          t: "Licencia propia",
+          lvl: "Muy alto",
+          rec: 0,
+          s: "Institución regulada por CNBV y Banxico. Años de trámite y capital.",
+          what: "Te conviertes en una institución regulada: fondos de pago electrónico ante la CNBV, o participante directo del SPEI.",
+          flow: "El dinero pasa por tu propia institución, con cuentas de tus clientes bajo tu custodia.",
+          risk: "Todo es tuyo: capital mínimo, auditorías, personal de cumplimiento y supervisión continua.",
+          pro: [
+            "Control total del dinero y del producto",
+            "Sin depender de terceros para operar",
+          ],
+          con: [
+            "Trámites de años",
+            "Capital y costos fijos altos",
+            "Requiere equipo legal y de cumplimiento",
+          ],
+          when: "Solo con un negocio ya probado y con inversión que lo respalde.",
+          time: "Años",
+          ex: "Instituciones de fondos de pago electrónico (Ley Fintech)",
+          say: "Es la versión real de «pasarela propia», y es un proyecto de años.",
+        },
+      ];
+      var DEEP = {
+        1: {
+          terms: [
+            [
+              "Proveedor de pagos (PSP)",
+              "Empresa que procesa los cobros por ti y se conecta con bancos y redes. Mercado Pago, Conekta y Openpay son ejemplos.",
+            ],
+            [
+              "Checkout alojado",
+              "Página de pago que vive en el proveedor. El cliente teclea ahí su tarjeta, así que los datos nunca pasan por tu sistema.",
+            ],
+            [
+              "Link de pago",
+              "URL que generas con monto y concepto y compartes por WhatsApp o correo. Al abrirla, el cliente cae en el checkout del proveedor.",
+            ],
+            [
+              "Terminal y QR",
+              "Cobro presencial: lector de tarjeta (como Point) o código QR que el cliente escanea con su app.",
+            ],
+            [
+              "Comisión por transacción",
+              "Lo que cobra el proveedor por cada cobro exitoso: un porcentaje más un cargo fijo, más IVA. Cambia según el método y el plazo.",
+            ],
+            [
+              "Plazo de liquidación",
+              "Días que tarda el dinero en llegar a tu cuenta. Recibirlo antes suele costar más comisión.",
+            ],
+            [
+              "Contracargo",
+              "Reclamo que el cliente hace a su banco por un cobro que desconoce. El proveedor te descuenta el monto mientras se resuelve.",
+            ],
+            [
+              "Retención de fondos",
+              "Bloqueo temporal de tu saldo que el proveedor puede aplicar por riesgo, ventas inusuales o disputas.",
+            ],
+            [
+              "MSI",
+              "Meses sin intereses. Tu cliente paga a plazos y tú absorbes un costo extra en la comisión.",
+            ],
+            [
+              "Sandbox",
+              "Ambiente de pruebas con dinero ficticio para integrar sin riesgo.",
+            ],
+            [
+              "Webhook",
+              "Aviso que el proveedor envía a una URL tuya cuando cambia el estado de un pago.",
+            ],
+          ],
+          biz: [
+            [
+              "Comercio",
+              "Se registra con el proveedor: RFC, identificación oficial y la cuenta bancaria donde recibirá el dinero.",
+            ],
+            [
+              "Proveedor",
+              "Verifica los datos y activa la cuenta. Puede pedir más documentos según el giro.",
+            ],
+            [
+              "Comercio",
+              "Elige los métodos de pago, el plazo de liquidación y si ofrece MSI.",
+            ],
+            [
+              "Comercio",
+              "Cobra: comparte un link, pone el checkout en su tienda o usa la terminal.",
+            ],
+            [
+              "Cliente",
+              "Paga con tarjeta, SPEI, efectivo o QR, según lo que el comercio habilitó.",
+            ],
+            [
+              "Proveedor",
+              "Descuenta su comisión y deposita el neto en el plazo elegido.",
+            ],
+            [
+              "Comercio",
+              "Factura la venta al cliente si la pide (CFDI) y concilia contra el reporte de movimientos del proveedor.",
+            ],
+          ],
+          bizNote: [
+            "Si hay contracargo, el comercio responde con evidencia (comprobante de entrega, conversación con el cliente). Decide el proveedor, y puede retener el saldo mientras tanto.",
+            "En este camino no hay comisión de plataforma para ti. Si lo ofreces como servicio, tu ingreso sería por implementación o asesoría.",
+          ],
+          tech: [
+            [
+              "Comercio",
+              "Crea la cuenta y obtiene credenciales de prueba y de producción.",
+            ],
+            [
+              "Comercio",
+              "Con tienda en línea, instala el plugin o integra el checkout del proveedor. Sin tienda, genera links desde el panel.",
+            ],
+            [
+              "Comercio",
+              "Crea la orden o preferencia de pago por API con monto, moneda y una referencia propia (el ID del pedido).",
+            ],
+            ["Cliente", "Es redirigido al checkout del proveedor y paga."],
+            [
+              "Proveedor",
+              "Envía un webhook al comercio con el estado del pago.",
+            ],
+            [
+              "Comercio",
+              "Valida la firma del webhook, consulta el pago por API para confirmarlo y marca el pedido como pagado.",
+            ],
+            [
+              "Comercio",
+              "Guarda el ID de pago del proveedor para reembolsos y conciliación.",
+            ],
+          ],
+          techNote: [
+            "No confíes en la redirección de regreso del navegador: el cliente puede cerrarla antes. Confirma siempre con el webhook y una consulta a la API.",
+            "Procesa cada webhook una sola vez guardando el ID del evento: los proveedores reintentan y pueden mandar el mismo aviso dos veces.",
+            "Prueba todo primero en sandbox: pagos aprobados, rechazados y expirados.",
+          ],
+        },
+        2: {
+          terms: [
+            [
+              "API de cobros",
+              "Interfaz que tus comercios llaman para crear y consultar cobros. Es el producto que construyes.",
+            ],
+            [
+              "Cargo (charge)",
+              "Registro de un intento de cobro: monto, moneda, método, estado y referencias del comercio.",
+            ],
+            [
+              "Idempotency-Key",
+              "Identificador único que el comercio manda en cada petición. Si la repite por un error de red, tu sistema devuelve el mismo resultado y no cobra dos veces.",
+            ],
+            [
+              "Conector (adaptador)",
+              "Módulo que traduce tu API a la de un proveedor concreto. Con una interfaz común puedes cambiar de proveedor sin reescribir todo.",
+            ],
+            [
+              "Máquina de estados",
+              "Reglas de qué cambios de estado son válidos: pending pasa a paid, failed o expired. Evita que un aviso duplicado o tardío rompa el cobro.",
+            ],
+            [
+              "Ledger de doble entrada",
+              "Libro contable donde cada movimiento tiene un débito y un crédito. De ahí salen los reportes y la conciliación.",
+            ],
+            [
+              "Webhook entrante y saliente",
+              "Entrante: el proveedor te avisa a ti. Saliente: tú avisas al comercio. Los dos necesitan firma, reintentos y registro.",
+            ],
+            [
+              "Firma HMAC",
+              "Código calculado con un secreto compartido para que quien recibe el webhook compruebe que viene de ti y no fue alterado. Se suele sumar un timestamp para evitar repeticiones.",
+            ],
+            [
+              "API key (test y live)",
+              "Credencial de cada comercio. Se guarda con hash y se muestra una sola vez. Las de prueba y las de producción van separadas.",
+            ],
+            [
+              "Multi-tenant",
+              "Un solo sistema que atiende a muchos comercios con sus datos aislados, usando un <code>merchant_id</code> en todo.",
+            ],
+            [
+              "Conciliación",
+              "Comparar tus registros contra el reporte del proveedor para detectar diferencias.",
+            ],
+            [
+              "Montos en centavos",
+              "Guardar el dinero como enteros (50000 equivale a $500.00), nunca como decimales flotantes.",
+            ],
+            [
+              "Alcance PCI",
+              "Con checkout alojado o campos del proveedor, los datos de tarjeta no tocan tu servidor y la carga de PCI es la más ligera. Confírmalo con tu proveedor.",
+            ],
+          ],
+          biz: [
+            [
+              "Comercio",
+              "Se registra en tu plataforma y acepta tus términos de servicio y tu aviso de privacidad.",
+            ],
+            [
+              "Tú",
+              "Haces un KYC básico: RFC, identificación y giro. Al inicio puede ser manual.",
+            ],
+            [
+              "Comercio",
+              "Conecta su cuenta con el proveedor (o se da de alta con él) para que el dinero llegue directo a su cuenta.",
+            ],
+            [
+              "Tú",
+              "Le entregas API keys de prueba, documentación y acceso al panel.",
+            ],
+            [
+              "Comercio",
+              "Cobra por API desde su sistema o con links de pago creados en tu panel.",
+            ],
+            [
+              "Cliente",
+              "Paga en un checkout con tu marca, por SPEI o tarjeta.",
+            ],
+            ["Proveedor", "Liquida el dinero al comercio, no a ti."],
+            [
+              "Tú",
+              "Cobras tu suscripción o tu comisión y facturas ese ingreso a cada comercio.",
+            ],
+          ],
+          bizNote: [
+            "Escribe en tus términos quién responde por fraude y contracargos. Si no está escrito, el problema llega a ti.",
+            "Cobrar un porcentaje por transacción es más fácil con reparto automático (camino 3). Aquí lo común es una suscripción mensual o cobrar tu comisión aparte.",
+          ],
+          tech: [
+            [
+              "Comercio",
+              "Llama <code>POST /charges</code> con su API key y una <code>Idempotency-Key</code>.",
+            ],
+            [
+              "Tu API",
+              "Valida la key, identifica al comercio y revisa que esa <code>Idempotency-Key</code> no se haya usado.",
+            ],
+            [
+              "Tu API",
+              "Guarda el cargo en estado <code>pending</code> y registra los asientos iniciales en el ledger.",
+            ],
+            [
+              "Conector",
+              "Crea el cobro en el proveedor y recibe una CLABE, una URL de checkout o una referencia.",
+            ],
+            [
+              "Tu API",
+              "Responde al comercio con el ID del cargo y los datos para pagar.",
+            ],
+            [
+              "Proveedor",
+              "Cuando el cliente paga, envía un webhook a tu endpoint.",
+            ],
+            [
+              "Tu API",
+              "Valida la firma, guarda el ID del evento para no procesarlo dos veces y aplica la transición de estado permitida.",
+            ],
+            [
+              "Tu API",
+              "Escribe en el ledger los asientos del pago y de tu comisión.",
+            ],
+            [
+              "Tu API",
+              "Envía <code>charge.paid</code> al comercio con firma HMAC y reintentos con espera creciente.",
+            ],
+            [
+              "Job diario",
+              "Concilia tus cargos contra el reporte del proveedor y marca las diferencias.",
+            ],
+          ],
+          techNote: [
+            "Los casos que más cuestan: webhooks duplicados o fuera de orden, pagos parciales, pagos que llegan después de expirar y timeouts. Si una llamada al proveedor falla, consulta su estado antes de reintentar.",
+            "Aísla los datos por <code>merchant_id</code> en cada consulta y prueba ese aislamiento.",
+            "Separa el modo test y el modo live desde el primer día.",
+          ],
+        },
+        3: {
+          terms: [
+            [
+              "Marketplace o plataforma",
+              "Tú: el sistema que reúne a varios comercios y por donde pasan sus cobros.",
+            ],
+            [
+              "Sub-comercio (cuenta conectada)",
+              "Cada comercio de tus clientes, con su propia subcuenta dentro del proveedor. Tiene su propia verificación y su propio saldo.",
+            ],
+            [
+              "Split payment (pago dividido)",
+              "Un solo cobro del cliente que el proveedor reparte entre el comercio y tu comisión.",
+            ],
+            [
+              "Comisión de plataforma",
+              "La parte del cobro que te corresponde a ti. En algunos proveedores se llama application fee.",
+            ],
+            [
+              "Onboarding delegado",
+              "El alta y la verificación de cada sub-comercio, que hace el proveedor con datos que tú le envías.",
+            ],
+            [
+              "Payout (dispersión)",
+              "Depósito del saldo del sub-comercio a su cuenta bancaria, según el calendario acordado.",
+            ],
+            [
+              "Facilitador de pagos (PayFac)",
+              "Esquema donde una plataforma procesa pagos para sus comercios bajo el contrato de un proveedor, y responde ante él por ellos.",
+            ],
+            [
+              "Comerciante registrado (merchant of record)",
+              "Quien aparece como vendedor ante la red de tarjetas y ante el cliente. Define quién responde por contracargos y fraude.",
+            ],
+            [
+              "Reserva",
+              "Parte del saldo que el proveedor guarda como garantía frente a contracargos.",
+            ],
+            [
+              "Contracargo",
+              "Reclamo del cliente a su banco. En un marketplace hay que definir si lo absorbe el sub-comercio o la plataforma.",
+            ],
+            [
+              "Reembolso y comisión",
+              "Al devolver un cobro hay que decidir si tu comisión también se devuelve. Cada proveedor lo resuelve a su manera.",
+            ],
+          ],
+          biz: [
+            [
+              "Tú",
+              "Pides al proveedor que apruebe tu plataforma para operar con sub-comercios. Esto lleva contrato y revisión.",
+            ],
+            [
+              "Comercio",
+              "Se da de alta en tu plataforma con sus datos fiscales, documentos y cuenta de depósito.",
+            ],
+            [
+              "Proveedor",
+              "Verifica al sub-comercio y lo activa. Puede pedir documentos adicionales.",
+            ],
+            ["Cliente", "Paga en un checkout con tu marca."],
+            [
+              "Proveedor",
+              "Divide el cobro: tu comisión para ti, la suya para él y el neto para el sub-comercio.",
+            ],
+            [
+              "Proveedor",
+              "Deposita al sub-comercio según el calendario de payouts.",
+            ],
+            ["Comercio", "Factura sus ventas al cliente."],
+            ["Tú", "Facturas tu comisión de plataforma a cada comercio."],
+          ],
+          bizNote: [
+            "Define en el contrato con el proveedor y en tus términos quién absorbe contracargos y devoluciones: el sub-comercio, tú, o ambos según el caso.",
+            "Disponibilidad en México: no todos los proveedores ofrecen sub-comercios ni con las mismas reglas. Confírmalo antes de comprometerte con un cliente.",
+          ],
+          tech: [
+            [
+              "Tu API",
+              "Crea una cuenta conectada en el proveedor por cada comercio nuevo.",
+            ],
+            [
+              "Tu API",
+              "Inicia el onboarding: formulario alojado del proveedor o datos enviados por API.",
+            ],
+            [
+              "Proveedor",
+              "Notifica por webhook los cambios de verificación: pendiente, activa o con documentos faltantes.",
+            ],
+            [
+              "Tu API",
+              "Crea cada cobro indicando la cuenta de destino y tu comisión.",
+            ],
+            [
+              "Proveedor",
+              "Procesa el pago y emite eventos: pagado, liquidado, payout enviado o fallido, disputa abierta.",
+            ],
+            [
+              "Tu API",
+              "Registra cada evento en tu ledger, con un libro por comercio que refleje lo que dice el proveedor.",
+            ],
+            [
+              "Tu API",
+              "Gestiona reembolsos y disputas: qué se devuelve, de quién y con qué comisión.",
+            ],
+            [
+              "Job diario",
+              "Concilia payouts y saldos contra los reportes del proveedor.",
+            ],
+          ],
+          techNote: [
+            "En muchos proveedores, poder cobrar y poder recibir payouts son estados distintos. Revisa ambos antes de dejar que un comercio venda.",
+            "Maneja los payouts fallidos (cuenta bancaria incorrecta o cerrada) con aviso al comercio y reintento.",
+            "Tu ledger debe distinguir saldo disponible, saldo pendiente de liquidar y comisiones.",
+          ],
+        },
+        4: {
+          terms: [
+            [
+              "BaaS (banca como servicio)",
+              "Una empresa con licencia te presta su infraestructura de cuentas y pagos por API, y tú construyes el producto encima.",
+            ],
+            [
+              "SPEI",
+              "Sistema de pagos electrónicos interbancarios de Banxico. Transferencias casi en tiempo real, 24/7.",
+            ],
+            [
+              "STP",
+              "Sistema de Transferencias y Pagos: participante del SPEI que ofrece cuentas y una API para recibir y enviar transferencias.",
+            ],
+            [
+              "CLABE",
+              "Clave bancaria de 18 dígitos: 3 del banco, 3 de la plaza, 11 de la cuenta y 1 verificador.",
+            ],
+            [
+              "CLABE por cliente (subcuenta)",
+              "CLABE única asignada a cada cliente o cobro. Cuando llega un abono sabes de quién es sin revisar a mano.",
+            ],
+            [
+              "Cuenta concentradora",
+              "Cuenta principal donde se reciben los abonos de todas las CLABEs asignadas.",
+            ],
+            [
+              "Orden de pago",
+              "Instrucción para enviar una transferencia SPEI de salida: cuenta destino, monto, concepto y referencia.",
+            ],
+            [
+              "Clave de rastreo",
+              "Identificador único de una transferencia SPEI. Sirve para evitar duplicados y para aclaraciones.",
+            ],
+            [
+              "CEP",
+              "Comprobante Electrónico de Pago: constancia de Banxico de que una transferencia se realizó.",
+            ],
+            [
+              "Cadena original y firma",
+              "Texto con los datos de la orden que se firma con tu certificado para que el proveedor sepa que la instrucción es tuya.",
+            ],
+            [
+              "Lista blanca de IPs",
+              "Solo las direcciones IP que registraste pueden llamar a la API del proveedor.",
+            ],
+            [
+              "Dispersión",
+              "Envío del dinero recibido a los comercios por SPEI.",
+            ],
+            [
+              "KYC",
+              "Conoce a tu cliente: identificar y verificar a quien usa tu plataforma.",
+            ],
+            [
+              "PLD (prevención de lavado de dinero)",
+              "Obligaciones de monitorear operaciones, detectar patrones sospechosos y reportar a la autoridad cuando corresponda.",
+            ],
+            [
+              "Ley Fintech",
+              "Ley que regula a las instituciones de tecnología financiera en México, incluidas las de fondos de pago electrónico.",
+            ],
+            [
+              "Devolución SPEI",
+              "Regreso de un abono que no se puede aplicar, por ejemplo si el monto no coincide. Necesita su propio flujo.",
+            ],
+          ],
+          biz: [
+            [
+              "Tú",
+              "Contratas a un proveedor BaaS con licencia. Revisa con un abogado fintech cómo queda tu papel.",
+            ],
+            [
+              "Comercio",
+              "Se registra y pasa tu KYC: identificación, RFC, giro y origen de los fondos.",
+            ],
+            [
+              "Tú",
+              "Asignas una CLABE por cliente o por cobro y la muestras en tu checkout.",
+            ],
+            ["Cliente", "Transfiere desde su banco, a cualquier hora."],
+            ["Proveedor", "Acredita el abono casi de inmediato y te avisa."],
+            [
+              "Tú",
+              "Identificas el pago por la CLABE, lo aplicas al cobro y lo registras en el ledger.",
+            ],
+            [
+              "Tú",
+              "Dispersas al comercio por SPEI el monto neto de tu comisión.",
+            ],
+            [
+              "Tú",
+              "Monitoreas operaciones inusuales y conservas la información que exige la normativa.",
+            ],
+            ["Comercio", "Factura su venta. Tú facturas tu comisión."],
+          ],
+          bizNote: [
+            "Si el dinero de los comercios pasa por una cuenta tuya, puedes caer en actividad regulada. No lo asumas: pide opinión legal antes de operar con clientes reales.",
+            "Un SPEI enviado no se puede cancelar. Un error de dispersión se corrige pidiendo la devolución al destinatario, así que valida bien la cuenta antes de enviar.",
+          ],
+          tech: [
+            [
+              "Tu API",
+              "Pide al proveedor una CLABE nueva o una subcuenta y la liga al cobro o al cliente.",
+            ],
+            ["Cliente", "Transfiere a esa CLABE."],
+            [
+              "Proveedor",
+              "Notifica el abono con clave de rastreo, monto, fecha y datos del ordenante.",
+            ],
+            [
+              "Tu API",
+              "Valida que el aviso venga del proveedor (firma o IP) y guarda la clave de rastreo para no procesarlo dos veces.",
+            ],
+            [
+              "Tu API",
+              "Busca el cobro por CLABE y compara el monto: exacto, parcial o excedente.",
+            ],
+            [
+              "Tu API",
+              "Actualiza el estado y escribe los asientos en el ledger.",
+            ],
+            [
+              "Tu API",
+              "Para dispersar: arma la orden, genera la cadena original, la firma con tu certificado y la envía a la API del proveedor desde una IP autorizada.",
+            ],
+            ["Proveedor", "Confirma la liquidación o informa una devolución."],
+            [
+              "Job diario",
+              "Concilia el estado de cuenta contra tu ledger y guarda los CEP.",
+            ],
+          ],
+          techNote: [
+            "Decide qué haces con abonos de monto distinto y con abonos que llegan después de que el cobro expiró: aplicar, devolver o dejar en revisión manual.",
+            "Protege el certificado de firma y las credenciales como secretos críticos. Quien los tenga puede mover dinero.",
+            "Aísla esta integración en un servicio pequeño y no la mezcles con el resto de tu aplicación.",
+          ],
+        },
+        5: {
+          terms: [
+            [
+              "Adquirente",
+              "Banco o empresa que tiene contrato con las redes de tarjetas y procesa los cobros del comercio. Recibe el dinero y lo liquida.",
+            ],
+            [
+              "Emisor",
+              "Banco que emitió la tarjeta del cliente. Aprueba o rechaza el cobro.",
+            ],
+            [
+              "Redes de tarjetas",
+              "Visa, Mastercard y American Express: conectan a emisores y adquirentes y fijan las reglas.",
+            ],
+            [
+              "Autorización",
+              "Respuesta del emisor que confirma que hay fondos y aprueba el cobro. Tarda segundos.",
+            ],
+            [
+              "Captura",
+              "Paso en que confirmas el cobro autorizado para que se liquide. Puede ser inmediata o diferida.",
+            ],
+            [
+              "Liquidación (settlement)",
+              "Depósito del dinero al comercio, unos días después, ya sin comisiones.",
+            ],
+            [
+              "Tasa de descuento (MDR)",
+              "Comisión total que el adquirente cobra al comercio. Incluye el intercambio, el costo de red y su margen.",
+            ],
+            [
+              "Interchange (intercambio)",
+              "Parte de la comisión que va al emisor. Suele ser la porción más grande y la definen las redes.",
+            ],
+            [
+              "Agregador (PayFac)",
+              "Esquema donde una empresa agrupa a muchos comercios bajo su contrato con el adquirente y responde por ellos.",
+            ],
+            [
+              "PCI DSS",
+              "Estándar de seguridad para quien almacena, procesa o transmite datos de tarjeta. A mayor alcance, más requisitos y auditorías.",
+            ],
+            [
+              "Tokenización",
+              "Reemplazar el número de tarjeta por un token inútil fuera de tu sistema, para no guardar datos sensibles.",
+            ],
+            [
+              "3-D Secure (3DS2)",
+              "Autenticación extra del titular durante el pago en línea. Traslada parte de la responsabilidad por fraude al emisor.",
+            ],
+            [
+              "Contracargo y representación",
+              "El emisor devuelve un cobro disputado. Tú puedes presentar evidencia para recuperarlo.",
+            ],
+            [
+              "Antifraude",
+              "Reglas y modelos que califican cada transacción y deciden si aprobar, revisar o rechazar.",
+            ],
+            [
+              "MCC",
+              "Código de giro del comercio. Afecta las tasas, el riesgo y qué productos se le pueden ofrecer.",
+            ],
+            [
+              "Reserva móvil (rolling reserve)",
+              "Porcentaje de las ventas que el adquirente retiene un tiempo como garantía.",
+            ],
+          ],
+          biz: [
+            [
+              "Tú",
+              "Negocias con un banco adquirente: análisis de riesgo, afiliación y condiciones de liquidación.",
+            ],
+            [
+              "Tú",
+              "Cumples los requisitos de seguridad (PCI) antes de procesar datos de tarjeta.",
+            ],
+            [
+              "Comercio",
+              "Se da de alta contigo. Evalúas su riesgo y su giro antes de activarlo.",
+            ],
+            ["Cliente", "Paga con su tarjeta en tu checkout."],
+            [
+              "Adquirente",
+              "Pide autorización al emisor a través de la red y responde en segundos.",
+            ],
+            [
+              "Adquirente",
+              "Liquida a tu cuenta unos días después, descontando sus comisiones.",
+            ],
+            ["Tú", "Pagas a cada comercio el neto, restando tu margen."],
+            [
+              "Tú",
+              "Atiendes los contracargos: pides evidencia al comercio y la presentas ante el adquirente.",
+            ],
+          ],
+          bizNote: [
+            "Tu ingreso es la diferencia entre lo que cobras al comercio y lo que te cobra el adquirente. Ese margen se lo comen el fraude y los contracargos si no los controlas.",
+            "Si pierdes un contracargo, el dinero se descuenta de tu liquidación aunque ya hayas pagado al comercio. Define cómo se lo cobras a él.",
+          ],
+          tech: [
+            [
+              "Cliente",
+              "Escribe su tarjeta en campos tokenizados, para que el número no pase por tus servidores.",
+            ],
+            [
+              "Tu API",
+              "Envía la solicitud de autorización al adquirente con el token, el monto y los datos del pedido.",
+            ],
+            ["Tu API", "Si aplica, dispara 3-D Secure y espera el resultado."],
+            [
+              "Adquirente",
+              "Responde aprobado o rechazado, con un código que indica el motivo.",
+            ],
+            [
+              "Tu API",
+              "Captura el cobro (de inmediato o después) y guarda las referencias de la transacción.",
+            ],
+            [
+              "Tu API",
+              "Registra el movimiento en el ledger y avisa al comercio por webhook.",
+            ],
+            ["Adquirente", "Envía archivos o reportes de liquidación."],
+            [
+              "Job diario",
+              "Concilia las liquidaciones contra tus transacciones y maneja reversos, reembolsos y contracargos.",
+            ],
+          ],
+          techNote: [
+            "Nunca guardes el número completo ni el código de seguridad (CVV) en tu base de datos ni en tus logs.",
+            "El antifraude (límites por velocidad, reglas por país y monto, listas de bloqueo) es obligatorio en la práctica: sin él, los contracargos pueden volver negativo tu margen.",
+            "Este camino exige un equipo de seguridad y operaciones. Pregunta al adquirente qué certificación pide para tu nivel de volumen.",
+          ],
+        },
+        6: {
+          terms: [
+            [
+              "IFPE",
+              "Institución de Fondos de Pago Electrónico: entidad autorizada para manejar cuentas de fondos de pago electrónico de sus clientes.",
+            ],
+            [
+              "Ley Fintech",
+              "Ley para Regular las Instituciones de Tecnología Financiera. Define quién puede operar y bajo qué reglas.",
+            ],
+            [
+              "CNBV",
+              "Comisión Nacional Bancaria y de Valores: autoriza y supervisa a las instituciones financieras.",
+            ],
+            [
+              "Banxico",
+              "Banco de México: opera el SPEI y emite las reglas que lo rigen.",
+            ],
+            [
+              "Autorización",
+              "Permiso oficial para operar como institución regulada. Sin él no puedes custodiar fondos de terceros.",
+            ],
+            [
+              "Capital mínimo",
+              "Monto de capital que debes acreditar para operar. Depende del tipo de institución y lo define la regulación.",
+            ],
+            [
+              "Fondos de pago electrónico",
+              "Recursos de tus clientes registrados en cuentas dentro de tu institución.",
+            ],
+            [
+              "Segregación de fondos",
+              "Mantener el dinero de los clientes separado del dinero de la empresa.",
+            ],
+            [
+              "Participante directo del SPEI",
+              "Institución conectada de forma directa al SPEI de Banxico, con sus propios requisitos técnicos y de operación.",
+            ],
+            [
+              "Oficial de cumplimiento",
+              "Responsable interno de que la institución cumpla la normativa, en particular la de prevención de lavado de dinero.",
+            ],
+            [
+              "KYC y debida diligencia",
+              "Identificación de cada cliente al abrir una cuenta y seguimiento mientras la usa.",
+            ],
+            [
+              "PLD/FT",
+              "Prevención de lavado de dinero y financiamiento al terrorismo: monitoreo, reportes y conservación de información.",
+            ],
+            [
+              "Continuidad operativa",
+              "Plan para seguir operando ante fallas o desastres. La regulación lo exige a instituciones como estas.",
+            ],
+            [
+              "Auditoría y reportes regulatorios",
+              "Revisiones periódicas y envío recurrente de información a las autoridades.",
+            ],
+          ],
+          biz: [
+            [
+              "Tú",
+              "Constituyes una sociedad con el objeto y la estructura de gobierno que pide la regulación.",
+            ],
+            [
+              "Tú",
+              "Preparas el plan de negocio, acreditas el capital y presentas la solicitud de autorización ante la CNBV.",
+            ],
+            [
+              "Autoridad",
+              "Revisa la solicitud y puede pedir cambios. El trámite puede tardar meses o más.",
+            ],
+            [
+              "Tú",
+              "Con la autorización, te conectas al SPEI y montas la operación: cuentas, atención y cumplimiento.",
+            ],
+            ["Cliente", "Abre cuenta contigo y pasa tu KYC."],
+            [
+              "Tú",
+              "Recibes y custodias sus fondos, procesas pagos y cobras tus comisiones.",
+            ],
+            [
+              "Tú",
+              "Monitoreas operaciones, reportas a las autoridades y pasas auditorías.",
+            ],
+            [
+              "Autoridad",
+              "Supervisa de forma continua y puede sancionar incumplimientos.",
+            ],
+          ],
+          bizNote: [
+            "Antes de dar un solo paso, contrata a un despacho especializado en regulación fintech. Requisitos, montos y plazos cambian y aquí no están verificados.",
+            "Hay una ruta intermedia: operar bajo la licencia de otro (camino 4) y solicitar la propia cuando el negocio ya esté probado.",
+          ],
+          tech: [
+            [
+              "Equipo",
+              "Construye un núcleo de cuentas y ledger que soporte auditoría y trazabilidad completa.",
+            ],
+            [
+              "Equipo",
+              "Se conecta al SPEI, directo o apoyado en un tercero, con firmas, certificados y redes seguras.",
+            ],
+            [
+              "Equipo",
+              "Implementa KYC con verificación de identidad y validación contra listas.",
+            ],
+            [
+              "Equipo",
+              "Monta el monitoreo de transacciones para PLD: reglas, alertas, casos y reportes.",
+            ],
+            [
+              "Equipo",
+              "Asegura la plataforma: gestión de llaves (HSM), cifrado, control de accesos y registro de auditoría.",
+            ],
+            [
+              "Equipo",
+              "Define la continuidad: respaldos, sitio alterno y pruebas de recuperación ante desastres.",
+            ],
+            [
+              "Equipo",
+              "Automatiza los reportes regulatorios y la conciliación diaria de todos los saldos.",
+            ],
+          ],
+          techNote: [
+            "El ledger de este camino no es solo contabilidad interna: es el registro de los fondos de tus clientes y las autoridades pueden revisarlo.",
+            "Este camino exige personal dedicado a seguridad, cumplimiento y operación, no solo a desarrollo.",
+          ],
+        },
+      };
+      function deepHTML(n) {
+        var x = DEEP[n];
+        var terms =
+          '<dl class="terms">' +
+          x.terms
+            .map(function (t) {
+              return "<div><dt>" + t[0] + "</dt><dd>" + t[1] + "</dd></div>";
+            })
+            .join("") +
+          "</dl>";
+        var steps = function (a) {
+          return (
+            '<ol class="steps">' +
+            a
+              .map(function (s) {
+                return (
+                  '<li><span class="who">' +
+                  s[0] +
+                  "</span><span>" +
+                  s[1] +
+                  "</span></li>"
+                );
+              })
+              .join("") +
+            "</ol>"
+          );
+        };
+        var notes = function (h, a) {
+          return (
+            '<div class="notes"><h5>' +
+            h +
+            "</h5><ul>" +
+            a
+              .map(function (s) {
+                return "<li>" + s + "</li>";
+              })
+              .join("") +
+            "</ul></div>"
+          );
+        };
+        return (
+          '<div class="tabs" role="tablist">' +
+          '<button class="tab" role="tab" data-tab="t" aria-selected="true">Terminología</button>' +
+          '<button class="tab" role="tab" data-tab="b" aria-selected="false">Flujo de negocio</button>' +
+          '<button class="tab" role="tab" data-tab="x" aria-selected="false">Flujo técnico</button></div>' +
+          '<div class="pane" id="pane-t">' +
+          terms +
+          "</div>" +
+          '<div class="pane" id="pane-b" hidden>' +
+          steps(x.biz) +
+          notes("Dinero y obligaciones", x.bizNote) +
+          "</div>" +
+          '<div class="pane" id="pane-x" hidden>' +
+          steps(x.tech) +
+          notes("Ojo con", x.techNote) +
+          "</div>"
+        );
+      }
+      var $ = function (s) {
+        return document.querySelector(s);
+      };
+      function dots(n) {
+        var h = "";
+        for (var i = 0; i < 6; i++)
+          h += "<i" + (i < n ? ' class="on"' : "") + "></i>";
+        return '<div class="dots" aria-hidden="true">' + h + "</div>";
+      }
+      function li(a) {
+        return (
+          "<ul>" +
+          a
+            .map(function (x) {
+              return "<li>" + x + "</li>";
+            })
+            .join("") +
+          "</ul>"
+        );
+      }
+      var grid = $("#grid");
+      grid.innerHTML = D.map(function (d) {
+        return (
+          '<button class="card' +
+          (d.rec ? " rec" : "") +
+          '" data-n="' +
+          d.n +
+          '" aria-label="Ver detalle: ' +
+          d.t +
+          '">' +
+          '<div class="top"><span class="tag">' +
+          d.n +
+          (d.rec ? " · Para arrancar" : "") +
+          "</span>" +
+          IC[d.n] +
+          "</div>" +
+          "<h3>" +
+          d.t +
+          "</h3><p>" +
+          d.s +
+          '</p><div class="spacer"></div>' +
+          dots(d.n) +
+          '<div class="lvl"><span>' +
+          d.lvl +
+          '</span><span class="more">Ver detalle →</span></div></button>'
+        );
+      }).join("");
+      grid.addEventListener("click", function (e) {
+        var b = e.target.closest(".card");
+        if (b) go(b.dataset.n);
+      });
+      function go(n) {
+        location.hash = n ? "c" + n : "";
+      }
+      function render() {
+        var m = /^#c([1-6])$/.exec(location.hash),
+          home = $("#home"),
+          det = $("#detail");
+        if (!m) {
+          home.hidden = false;
+          det.hidden = true;
+          return;
+        }
+        var d = D[+m[1] - 1],
+          p = D[(d.n + 4) % 6],
+          nx = D[d.n % 6];
+        home.hidden = true;
+        det.hidden = false;
+        det.innerHTML =
+          '<div class="bar"><button class="btn" data-go="">← Todos los caminos</button><span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-go="' +
+          p.n +
+          '">← ' +
+          p.n +
+          '</button><button class="btn" data-go="' +
+          nx.n +
+          '">' +
+          nx.n +
+          " →</button></span></div>" +
+          '<div class="head">' +
+          IC[d.n] +
+          '<div><div class="tag">Camino ' +
+          d.n +
+          (d.rec ? " · Para arrancar" : "") +
+          "</div><h2>" +
+          d.t +
+          "</h2><p>" +
+          d.what +
+          "</p></div></div>" +
+          '<div class="meta"><div><small>Complejidad</small><b>' +
+          d.lvl +
+          "</b>" +
+          dots(d.n) +
+          "</div><div><small>Tiempo aproximado</small><b>" +
+          d.time +
+          "</b></div><div><small>Ejemplos</small><b>" +
+          d.ex +
+          "</b></div></div>" +
+          '<div class="deepbar"><button class="btn deepbtn" id="deepBtn" aria-expanded="false" aria-controls="deep">Detalles profundos</button></div><div id="deep" hidden>' +
+          deepHTML(d.n) +
+          "</div>" +
+          '<div class="cols"><div class="box"><h4>Cómo se mueve el dinero</h4><p>' +
+          d.flow +
+          '</p></div><div class="box"><h4>Quién carga con el riesgo</h4><p>' +
+          d.risk +
+          "</p></div>" +
+          '<div class="box"><h4>A favor</h4>' +
+          li(d.pro) +
+          '</div><div class="box no"><h4>En contra</h4>' +
+          li(d.con) +
+          "</div></div>" +
+          '<div class="box" style="margin-top:20px"><h4>Cuándo elegirlo</h4><p>' +
+          d.when +
+          "</p></div>" +
+          '<div class="say"><small>En pocas palabras</small>' +
+          d.say +
+          "</div>";
+        window.scrollTo(0, 0);
+      }
+      $("#detail").addEventListener("click", function (e) {
+        var b = e.target.closest("[data-go]");
+        if (b) {
+          go(b.dataset.go);
+          return;
+        }
+        if (e.target.closest("#deepBtn")) {
+          var p = $("#deep"),
+            btn = $("#deepBtn"),
+            open = p.hidden;
+          p.hidden = !open;
+          btn.setAttribute("aria-expanded", String(open));
+          btn.textContent = open
+            ? "Ocultar detalles profundos"
+            : "Detalles profundos";
+          return;
+        }
+        var t = e.target.closest("[data-tab]");
+        if (t) {
+          var w = $("#deep");
+          w.querySelectorAll(".tab").forEach(function (x) {
+            x.setAttribute("aria-selected", String(x === t));
+          });
+          w.querySelectorAll(".pane").forEach(function (x) {
+            x.hidden = x.id !== "pane-" + t.dataset.tab;
+          });
+        }
+      });
+      window.addEventListener("hashchange", render);
+      render();
+    </script>
+  </body>
+</html>
