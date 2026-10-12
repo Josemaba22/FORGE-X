@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FORGE X · Mi lectura de tu visión</title>
+<title>FORGE X · Visión vs. estado del arte</title>
 <style>
   :root {
     --bg: #f7f6f2;
@@ -15,8 +15,8 @@
     --accent-soft: #e3f3ee;
     --warn: #b4571b;
     --warn-soft: #fbece1;
-    --no: #8a2f2f;
-    --no-soft: #f8e6e6;
+    --info: #1f5fa8;
+    --info-soft: #e5eef8;
   }
   @media (prefers-color-scheme: dark) {
     :root {
@@ -29,8 +29,8 @@
       --accent-soft: #15302a;
       --warn: #e8935a;
       --warn-soft: #34261b;
-      --no: #e48a8a;
-      --no-soft: #36201f;
+      --info: #7db3ee;
+      --info-soft: #172433;
     }
   }
   * { box-sizing: border-box; }
@@ -40,21 +40,24 @@
     color: var(--ink);
     font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
-  .wrap { max-width: 880px; margin: 0 auto; padding: 40px 16px 72px; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 16px 72px; }
   header { margin-bottom: 32px; }
   .tag {
     display: inline-block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
     color: var(--accent); background: var(--accent-soft); padding: 4px 10px; border-radius: 999px; font-weight: 600;
   }
   h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 14px 0 10px; letter-spacing: -.02em; }
-  .lead { color: var(--muted); font-size: 18px; margin: 0; max-width: 680px; }
-  section { margin-top: 40px; }
-  h2 { font-size: 22px; margin: 0 0 14px; letter-spacing: -.01em; }
+  .lead { color: var(--muted); font-size: 18px; margin: 0; max-width: 700px; }
+  section { margin-top: 44px; }
+  h2 { font-size: 22px; margin: 0 0 6px; letter-spacing: -.01em; }
+  .sub { color: var(--muted); margin: 0 0 16px; font-size: 15px; }
   h3 { font-size: 16px; margin: 0 0 6px; }
   p { margin: 0 0 12px; }
-  .card {
-    background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px;
-  }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+  .card p { color: var(--muted); font-size: 15px; margin: 0; }
+  .card + .card { margin-top: 10px; }
+  .quote { background: var(--accent-soft); border-radius: 14px; padding: 22px; font-size: 18px; line-height: 1.5; }
+  .quote strong { color: var(--accent); }
   .shift { display: grid; grid-template-columns: 1fr; gap: 12px; }
   @media (min-width: 700px) { .shift { grid-template-columns: 1fr 40px 1fr; align-items: stretch; } }
   .arrow { display: none; align-items: center; justify-content: center; color: var(--muted); font-size: 24px; }
@@ -64,188 +67,233 @@
   .label { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; margin-bottom: 6px; }
   .before .label { color: var(--warn); }
   .after .label { color: var(--accent); }
-  .grid3 { display: grid; gap: 12px; grid-template-columns: 1fr; }
-  @media (min-width: 700px) { .grid3 { grid-template-columns: repeat(3, 1fr); } }
-  .num {
-    width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff;
-    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; margin-bottom: 10px;
-  }
-  .card p { color: var(--muted); font-size: 15px; margin: 0; }
-  ol.flow { list-style: none; margin: 0; padding: 0; counter-reset: s; }
-  ol.flow li {
-    counter-increment: s; position: relative; padding: 12px 0 12px 44px; border-bottom: 1px solid var(--line);
-  }
-  ol.flow li:last-child { border-bottom: 0; }
-  ol.flow li::before {
-    content: counter(s); position: absolute; left: 0; top: 12px; width: 28px; height: 28px; border-radius: 50%;
-    background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 14px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .scope { display: grid; gap: 12px; grid-template-columns: 1fr; }
-  @media (min-width: 700px) { .scope { grid-template-columns: 1fr 1fr; } }
-  .scope ul { margin: 0; padding-left: 18px; }
-  .scope li { margin: 6px 0; }
-  .in h3 { color: var(--accent); }
-  .out h3 { color: var(--no); }
-  .out { background: var(--no-soft); border-color: transparent; }
-  .in { background: var(--accent-soft); border-color: transparent; }
-  .decisions .card { margin-bottom: 10px; border-left: 4px solid var(--warn); }
-  .decisions h3 { color: var(--warn); }
-  .quote {
-    background: var(--accent-soft); border-radius: 14px; padding: 22px; font-size: 18px; line-height: 1.5;
-  }
-  .quote strong { color: var(--accent); }
-  table { width: 100%; border-collapse: collapse; font-size: 15px; }
-  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { color: var(--muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; }
+  .finding { border-left: 4px solid var(--info); }
+  .finding h3 { color: var(--info); }
+  .finding .when { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .caution { border-left: 4px solid var(--warn); }
+  .caution h3 { color: var(--warn); }
   .tablewrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 640px; }
+  th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+  td:first-child { font-weight: 600; width: 22%; }
+  .pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
+  .p-ok { background: var(--accent-soft); color: var(--accent); }
+  .p-mid { background: var(--info-soft); color: var(--info); }
+  .p-gap { background: var(--warn-soft); color: var(--warn); }
+  .paths { display: grid; gap: 12px; grid-template-columns: 1fr; }
+  @media (min-width: 760px) { .paths { grid-template-columns: repeat(3, 1fr); } }
+  .paths .card + .card { margin-top: 0; }
+  .paths ul { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 14.5px; }
+  .paths li { margin: 4px 0; }
+  .paths h4 { margin: 12px 0 0; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink); }
+  ol.q { margin: 0; padding-left: 20px; }
+  ol.q li { margin: 10px 0; }
+  ol.q li span { color: var(--muted); display: block; font-size: 14.5px; }
+  .sources { font-size: 14px; color: var(--muted); }
+  .sources ul { padding-left: 18px; margin: 8px 0 0; }
+  .sources li { margin: 4px 0; }
+  a { color: var(--info); }
   footer { margin-top: 48px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 16px; }
 </style>
 </head>
 <body>
-<a href="index.html" class="home-btn" aria-label="Volver al inicio" style="position:fixed;top:12px;left:12px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:#16283B;color:#fff;font:600 14px/1 system-ui,-apple-system,'Segoe UI',Arial,sans-serif;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.35)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</a>
 <div class="wrap">
 
 <header>
   <span class="tag">FORGE X · Fase 0</span>
-  <h1>Mi lectura de tu visión</h1>
-  <p class="lead">Después de analizar a fondo los caminos que te compartí, quiero explicarte a qué conclusión llegué sobre lo que realmente buscas construir, y cómo propongo aterrizarlo.</p>
+  <h1>La visión del proyecto frente al estado actual del arte</h1>
+  <p class="lead">Guía para contrastar lo que se quiere construir con lo que el mercado ya ofrece hoy. No es una propuesta de desarrollo: es un mapa para decidir con información.</p>
 </header>
 
 <section>
   <div class="quote">
-    <strong>Lo que entendí:</strong> quieres crear una agencia de software que entregue a cada negocio su ecosistema digital completo: una tienda en línea con catálogo y pago digital, más un asistente de WhatsApp que atienda a sus clientes, sin involucrarte en la logística de almacenamiento ni distribución.
+    <strong>Visión, en una frase:</strong> una agencia de software que crea el ecosistema digital de un negocio (tienda en línea con catálogo y pago digital, más un asistente de WhatsApp que atiende consultas del cliente final), sin involucrarse en la logística de almacenamiento ni distribución.
   </div>
 </section>
 
 <section>
-  <h2>Dónde ajusté el enfoque</h2>
+  <h2>Cómo se llegó a esta lectura</h2>
+  <p class="sub">El planteamiento inicial se fue acotando al analizar los caminos posibles.</p>
   <div class="shift">
     <div class="card before">
       <div class="label">Punto de partida</div>
       <h3>Cobrar dentro de WhatsApp</h3>
-      <p>Usar el chat como canal de cobro y de cierre de la venta.</p>
+      <p>El chat como canal de cobro y cierre de la venta, con pasarela propia.</p>
     </div>
     <div class="arrow">→</div>
     <div class="card after">
-      <div class="label">Mi conclusión</div>
+      <div class="label">Lectura actual</div>
       <h3>Ecosistema del negocio + asistente</h3>
-      <p>La tienda en línea resuelve catálogo y pago. WhatsApp se vuelve el asistente que orienta, filtra y responde.</p>
-    </div>
-  </div>
-  <p style="margin-top:14px;color:var(--muted)">Mi razonamiento: una tienda en línea ya te permite tener catálogo, compartir la URL de cada producto y cobrar de forma digital. Cobrar dentro de WhatsApp añadiría complejidad (costos por mensaje, riesgo en pagos, regulación) sin sumar lo que el cliente final realmente valora: que lo atiendan rápido y con claridad. Por eso creo que el valor de WhatsApp está en la atención, no en el cobro.</p>
-</section>
-
-<section>
-  <h2>Lo que te propongo construir: tres piezas</h2>
-  <div class="grid3">
-    <div class="card">
-      <div class="num">1</div>
-      <h3>Tienda web</h3>
-      <p>Página del negocio con su catálogo de productos o servicios y su información.</p>
-    </div>
-    <div class="card">
-      <div class="num">2</div>
-      <h3>Pago digital</h3>
-      <p>Pasarela de un proveedor externo, conectada a la cuenta del propio negocio.</p>
-    </div>
-    <div class="card">
-      <div class="num">3</div>
-      <h3>Asistente de WhatsApp</h3>
-      <p>Filtra el catálogo, resuelve dudas del proceso de compra y da información del negocio.</p>
+      <p>La tienda en línea ya aporta catálogo y pago digital. WhatsApp funciona como asistente que filtra el catálogo y resuelve dudas del proceso de compra o del negocio.</p>
     </div>
   </div>
 </section>
 
 <section>
-  <h2>Cómo lo viviría el cliente final</h2>
+  <h2>Estado del arte (octubre 2026)</h2>
+  <p class="sub">Lo que se encontró al revisar el mercado. Es un campo que cambia rápido; conviene reconfirmar antes de decidir.</p>
+
+  <div class="card finding">
+    <h3>1. WhatsApp ya ofrece asistentes de IA nativos para negocios</h3>
+    <p>Meta anunció agentes de IA dentro de WhatsApp Business con México como primer país del mundo. Pueden recomendar productos del catálogo, responder preguntas frecuentes y pasar la conversación a una persona cuando el negocio lo defina. Requieren cuenta en español y al menos un producto en el catálogo. Según Xataka México, también se conectan al catálogo de tiendas Tiendanube (inventario, precios, disponibilidad y estado de pedidos).</p>
+    <div class="when">Disponible en México desde el 3 de noviembre de 2025</div>
+  </div>
+
+  <div class="card finding">
+    <h3>2. Las plataformas de tienda ya integran asistentes de WhatsApp</h3>
+    <p>Tiendanube compró la startup VICI y lanzó Nuvem Chat, un asistente de IA para WhatsApp dirigido a sus comerciantes en Latinoamérica. Además existen apps de terceros que se conectan a Shopify, Tiendanube, WooCommerce o VTEX para responder sobre catálogo, pedidos y envíos, con escalamiento a humano. Como referencia de precio, una de ellas para Shopify parte de USD 299 al mes.</p>
+    <div class="when">Oferta activa de plataformas y apps de terceros</div>
+  </div>
+
+  <div class="card finding">
+    <h3>3. Soluciones "tienda + WhatsApp" listas para México</h3>
+    <p>Hay productos que combinan tienda en línea, pedidos por WhatsApp y múltiples pasarelas (Stripe, Mercado Pago, Clip, PayPal, entre otras). También existen proveedores con servicio de implementación y onboarding en español para negocios mexicanos.</p>
+    <div class="when">Ejemplos: Take App, Cliengo, Burbuxa</div>
+  </div>
+
+  <div class="card caution">
+    <h3>4. Cobrar dentro del chat no está consolidado en México</h3>
+    <p>Las fuentes no coinciden: una guía de Infobip lista a México entre los mercados considerados pero aún no lanzados, mientras otras fuentes lo mencionan como disponible para pagos de negocios. En la práctica, el patrón extendido es compartir un enlace de pago de una pasarela y confirmar en el chat. Conviene verificar el estado real en la documentación oficial de Meta antes de asumir algo.</p>
+    <div class="when">Información contradictoria: validar con fuente oficial</div>
+  </div>
+
+  <div class="card caution">
+    <h3>5. El costo por mensaje es una variable permanente</h3>
+    <p>Desde julio de 2025 Meta cobra por mensaje entregado, según categoría y país del destinatario. Según análisis del sector, desde el 1 de octubre de 2026 las respuestas libres dentro de la ventana de 24 horas (antes gratuitas) también pasan a ser cobrables, a la tarifa de utilidad del mercado. Los proveedores intermediarios pueden añadir recargos sobre la tarifa de Meta. Esto pesa directamente en el costo de operar un asistente que conversa mucho.</p>
+    <div class="when">Cambio vigente desde octubre 2026 · confirmar tarifas de México en Meta</div>
+  </div>
+
+  <div class="card caution">
+    <h3>6. Política de IA: asistentes de negocio sí, generalistas no</h3>
+    <p>Desde el 15 de enero de 2026 Meta prohíbe en su API los chatbots de IA de propósito general. No afecta a negocios que usan IA para atender a sus propios clientes (pedidos, dudas, reservas). Un asistente acotado al catálogo y la información del negocio queda dentro de lo permitido.</p>
+    <div class="when">Vigente desde 15 de enero de 2026</div>
+  </div>
+</section>
+
+<section>
+  <h2>La visión frente a lo que existe</h2>
+  <p class="sub">Comparación pieza por pieza.</p>
   <div class="card">
-    <ol class="flow">
-      <li><strong>Escribe por WhatsApp</strong> con una duda o buscando algo.</li>
-      <li><strong>El asistente lo orienta:</strong> filtra el catálogo según lo que necesita y responde preguntas puntuales (precios, tallas, horarios, formas de pago, etc.).</li>
-      <li><strong>Le comparte la URL del producto</strong> en la tienda en línea.</li>
-      <li><strong>El cliente paga en la web</strong> con la pasarela digital.</li>
-      <li><strong>El negocio atiende el pedido</strong> con su propia operación y logística.</li>
-    </ol>
-  </div>
-</section>
-
-<section>
-  <h2>Alcance que propongo</h2>
-  <div class="scope">
-    <div class="card in">
-      <h3>Sí incluiría</h3>
-      <ul>
-        <li>Tienda web con catálogo y pago digital</li>
-        <li>Asistente de WhatsApp para consultas y orientación de compra</li>
-        <li>Conexión entre el catálogo y el asistente</li>
-        <li>Configuración por negocio (marca, contenido, respuestas)</li>
-      </ul>
-    </div>
-    <div class="card out">
-      <h3>No incluiría</h3>
-      <ul>
-        <li>Almacenamiento ni inventario físico</li>
-        <li>Distribución o envíos</li>
-        <li>Una pasarela de pago construida desde cero</li>
-        <li>Manejar el dinero de los negocios</li>
-      </ul>
-    </div>
-  </div>
-  <p style="margin-top:14px;color:var(--muted)">Sobre la pasarela propia: recomiendo apoyarnos en un proveedor externo. Así no cargamos con el riesgo regulatorio ni con la responsabilidad del dinero de terceros, y el negocio recibe sus pagos directo en su cuenta.</p>
-</section>
-
-<section>
-  <h2>Cómo veo el modelo de agencia</h2>
-  <div class="card">
-    <p style="color:var(--ink)">Para que esto funcione como agencia y no como consultoría a la medida, la base técnica debe ser <strong>reutilizable</strong>: una tienda y un asistente configurables por negocio, donde solo se personalice contenido, marca y reglas de atención. Así cada nuevo cliente se entrega más rápido y con mejor margen.</p>
     <div class="tablewrap">
       <table>
-        <thead><tr><th>Componente</th><th>Quién lo cubre</th></tr></thead>
+        <thead>
+          <tr><th>Pieza de la visión</th><th>Qué existe hoy</th><th>Situación</th></tr>
+        </thead>
         <tbody>
-          <tr><td>Desarrollo y configuración del ecosistema</td><td>La agencia</td></tr>
-          <tr><td>Pasarela de pago</td><td>Proveedor externo, en cuenta del negocio</td></tr>
-          <tr><td>Número de WhatsApp y costo de mensajes</td><td>El negocio</td></tr>
-          <tr><td>Logística y entrega</td><td>El negocio</td></tr>
+          <tr>
+            <td>Tienda web con catálogo</td>
+            <td>Tiendanube, Shopify, WooCommerce, VTEX y soluciones listas como Take App.</td>
+            <td><span class="pill p-ok">Ya resuelto</span></td>
+          </tr>
+          <tr>
+            <td>Pago digital</td>
+            <td>Pasarelas de terceros integradas a las tiendas (Stripe, Mercado Pago, Clip, PayPal, entre otras).</td>
+            <td><span class="pill p-ok">Ya resuelto</span></td>
+          </tr>
+          <tr>
+            <td>Asistente que filtra catálogo y responde dudas</td>
+            <td>Asistente nativo de WhatsApp Business, Nuvem Chat de Tiendanube y apps de terceros.</td>
+            <td><span class="pill p-ok">Ya existe</span></td>
+          </tr>
+          <tr>
+            <td>Escalamiento a una persona</td>
+            <td>Configurable en el asistente nativo y en la mayoría de soluciones de terceros.</td>
+            <td><span class="pill p-ok">Ya existe</span></td>
+          </tr>
+          <tr>
+            <td>Consulta del estado del pedido</td>
+            <td>Disponible cuando el asistente se integra con la plataforma de la tienda.</td>
+            <td><span class="pill p-mid">Depende de la integración</span></td>
+          </tr>
+          <tr>
+            <td>Cobro dentro del chat</td>
+            <td>No consolidado en México; se usa el enlace de pago hacia la tienda.</td>
+            <td><span class="pill p-gap">Por verificar</span></td>
+          </tr>
+          <tr>
+            <td>Entrega integrada, configurada y acompañada por negocio</td>
+            <td>Mayormente productos de autoservicio; algunos proveedores ofrecen onboarding y servicio local.</td>
+            <td><span class="pill p-mid">Cubierto parcialmente</span></td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
+  <p style="margin-top:14px;color:var(--muted)">Lectura neutral: casi todas las piezas de la visión existen hoy por separado y en buena medida ya integradas entre sí. Lo menos cubierto es el servicio de armarlo, configurarlo y sostenerlo por negocio. La decisión de dónde está el valor propio de la agencia queda abierta.</p>
 </section>
 
-<section class="decisions">
-  <h2>Lo que necesito que me confirmes</h2>
-  <div class="card">
-    <h3>Cómo cobrarías el servicio</h3>
-    <p>¿Suscripción mensual por negocio, proyecto único con cobro de implementación, o una combinación? Esto define buena parte del diseño técnico y de la propuesta comercial.</p>
-  </div>
-  <div class="card">
-    <h3>Hasta dónde llega el asistente</h3>
-    <p>Qué debe resolver solo y cuándo pasa la conversación a una persona (reclamos, pedidos especiales).</p>
-  </div>
-  <div class="card">
-    <h3>Preguntas sobre el pedido</h3>
-    <p>Aunque no nos metamos en logística, el cliente preguntará "¿dónde está mi pedido?". Hay que decidir si el asistente lo responde o si queda fuera de alcance.</p>
-  </div>
-  <div class="card">
-    <h3>Facturación SAT</h3>
-    <p>Sé que es deseable después del pago. La dejaría como mejora futura y no en esta primera etapa.</p>
+<section>
+  <h2>Caminos posibles frente a este panorama</h2>
+  <p class="sub">Se presentan sin jerarquía; cada uno responde a una apuesta distinta.</p>
+  <div class="paths">
+    <div class="card">
+      <h3>A · Construir producto propio</h3>
+      <p>Tienda y asistente desarrollados desde cero y reutilizables entre negocios.</p>
+      <h4>A favor</h4>
+      <ul><li>Control total y marca propia</li><li>Margen sin licencias de terceros</li></ul>
+      <h4>En contra</h4>
+      <ul><li>Compite con plataformas ya establecidas</li><li>Mayor costo y tiempo de desarrollo y mantenimiento</li></ul>
+    </div>
+    <div class="card">
+      <h3>B · Ensamblar piezas existentes</h3>
+      <p>Usar tienda, pasarela y asistente ya disponibles, integrados y configurados por negocio.</p>
+      <h4>A favor</h4>
+      <ul><li>Salida rápida y menor riesgo técnico</li><li>Se apoya en lo ya probado</li></ul>
+      <h4>En contra</h4>
+      <ul><li>Dependencia de las plataformas y sus precios</li><li>Menos diferenciación técnica</li></ul>
+    </div>
+    <div class="card">
+      <h3>C · Servicio de implementación</h3>
+      <p>Foco en el acompañamiento: diseño de la tienda, contenido, configuración del asistente y operación continua.</p>
+      <h4>A favor</h4>
+      <ul><li>Valor claro para negocios sin perfil técnico</li><li>Poco desarrollo propio</li></ul>
+      <h4>En contra</h4>
+      <ul><li>Crece con horas de personas, no con producto</li><li>Hay proveedores locales ya posicionados</li></ul>
+    </div>
   </div>
 </section>
 
 <section>
-  <h2>Siguientes pasos</h2>
+  <h2>Preguntas para definir el rumbo</h2>
   <div class="card">
-    <ol class="flow">
-      <li>Revisar contigo esta lectura y confirmar que refleja tu visión.</li>
-      <li>Resolver los puntos abiertos, empezando por el modelo de cobro.</li>
-      <li>Definir el alcance del primer negocio piloto.</li>
-      <li>Elegir el proveedor de pago y la arquitectura base reutilizable.</li>
+    <ol class="q">
+      <li>¿Dónde se quiere diferenciar la agencia frente a lo que ya existe?
+        <span>Tecnología propia, servicio y acompañamiento, o enfoque en un tipo de negocio específico.</span></li>
+      <li>¿Cómo se cobraría el servicio?
+        <span>Suscripción mensual por negocio, proyecto único de implementación, o una combinación.</span></li>
+      <li>¿Quién absorbe los costos recurrentes?
+        <span>Mensajes de WhatsApp, modelo de IA, hosting y pasarela. Con el costo por mensaje en aumento, este punto pesa en el margen.</span></li>
+      <li>¿Hasta dónde llega el asistente?
+        <span>Qué resuelve solo, cuándo pasa a una persona y si responde por el estado de los pedidos.</span></li>
+      <li>¿Qué pasa con el cobro dentro del chat?
+        <span>Si se descarta en favor del enlace de pago, o se espera a confirmar su disponibilidad en México.</span></li>
+      <li>¿Se contempla la facturación SAT?
+        <span>Es deseable después del pago; queda como mejora posterior.</span></li>
     </ol>
   </div>
 </section>
 
-<footer>FORGE X · Análisis de fase 0 · Octubre 2026</footer>
+<section class="sources">
+  <h2>Fuentes consultadas</h2>
+  <div class="card">
+    <ul>
+      <li><a href="https://expansion.mx/tecnologia/2025/10/16/mexico-primer-pais-agentes-de-ia-whatsapp-business">Expansión · México, primer país con agentes de IA en WhatsApp Business</a></li>
+      <li><a href="https://www.xataka.com.mx/comercio-electronico/whatsapp-principal-medio-para-vender-mexico-meta-tiendanube-creen-que-ahora-ia-puede-hacer-trabajo">Xataka México · WhatsApp como principal medio de venta, Meta y Tiendanube</a></li>
+      <li><a href="https://latamlist.com/?p=17297">Latamlist · Tiendanube adquiere VICI y lanza Nuvem Chat</a></li>
+      <li><a href="https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing">Meta · Precios de la WhatsApp Business Platform</a></li>
+      <li><a href="https://yournotify.com/blog/whatsapp-pricing-update-2026/">Yournotify · Cambio de precios del 1 de octubre de 2026</a></li>
+      <li><a href="https://www.engagelab.com/blog/whatsapp-pricing-2026-service-message-cost">EngageLab · Precios de WhatsApp 2026 y mensajes de servicio</a></li>
+      <li><a href="https://respond.io/blog/whatsapp-general-purpose-chatbots-ban">respond.io · Política de WhatsApp sobre chatbots de propósito general</a>; <a href="https://www.dataslayer.ai/blog/meta-bans-general-purpose-ai-chatbots-on-whatsapp-business">Dataslayer · Qué cambió el 15 de enero de 2026</a></li>
+      <li><a href="https://infobip.com/blog/whatsapp-payments">Infobip · Pagos en WhatsApp por país</a></li>
+      <li><a href="https://www.take.app/country/mexico">Take App · Tienda con WhatsApp en México</a></li>
+      <li><a href="https://burbuxa.com/en/integrations/tiendanube">Burbuxa · Integración con Tiendanube</a>; <a href="https://bitbybit.studio/lp/ai-agent-for-shopify/">bitbybit · Agente de IA para Shopify</a></li>
+      <li><a href="https://guiawabusiness.cliengo.com/whatsapp-business-mexico">Cliengo · WhatsApp Business en México</a></li>
+    </ul>
+  </div>
+</section>
+
+<footer>FORGE X · Análisis de fase 0 · Información revisada en octubre de 2026. Las condiciones de precios, políticas y disponibilidad de WhatsApp cambian con frecuencia.</footer>
 
 </div>
 </body>
