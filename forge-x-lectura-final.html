@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FORGE X · Mi lectura de tu visión</title>
+<style>
+  :root {
+    --bg: #f7f6f2;
+    --card: #ffffff;
+    --ink: #1c1b19;
+    --muted: #6b6860;
+    --line: #e4e1d8;
+    --accent: #0f7b5f;
+    --accent-soft: #e3f3ee;
+    --warn: #b4571b;
+    --warn-soft: #fbece1;
+    --no: #8a2f2f;
+    --no-soft: #f8e6e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141413;
+      --card: #1e1e1c;
+      --ink: #efede6;
+      --muted: #a29f95;
+      --line: #33322e;
+      --accent: #3ec9a0;
+      --accent-soft: #15302a;
+      --warn: #e8935a;
+      --warn-soft: #34261b;
+      --no: #e48a8a;
+      --no-soft: #36201f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 40px 16px 72px; }
+  header { margin-bottom: 32px; }
+  .tag {
+    display: inline-block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-soft); padding: 4px 10px; border-radius: 999px; font-weight: 600;
+  }
+  h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 14px 0 10px; letter-spacing: -.02em; }
+  .lead { color: var(--muted); font-size: 18px; margin: 0; max-width: 680px; }
+  section { margin-top: 40px; }
+  h2 { font-size: 22px; margin: 0 0 14px; letter-spacing: -.01em; }
+  h3 { font-size: 16px; margin: 0 0 6px; }
+  p { margin: 0 0 12px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px;
+  }
+  .shift { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 700px) { .shift { grid-template-columns: 1fr 40px 1fr; align-items: stretch; } }
+  .arrow { display: none; align-items: center; justify-content: center; color: var(--muted); font-size: 24px; }
+  @media (min-width: 700px) { .arrow { display: flex; } }
+  .before { border-left: 4px solid var(--warn); }
+  .after { border-left: 4px solid var(--accent); }
+  .label { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; margin-bottom: 6px; }
+  .before .label { color: var(--warn); }
+  .after .label { color: var(--accent); }
+  .grid3 { display: grid; gap: 12px; grid-template-columns: 1fr; }
+  @media (min-width: 700px) { .grid3 { grid-template-columns: repeat(3, 1fr); } }
+  .num {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; margin-bottom: 10px;
+  }
+  .card p { color: var(--muted); font-size: 15px; margin: 0; }
+  ol.flow { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+  ol.flow li {
+    counter-increment: s; position: relative; padding: 12px 0 12px 44px; border-bottom: 1px solid var(--line);
+  }
+  ol.flow li:last-child { border-bottom: 0; }
+  ol.flow li::before {
+    content: counter(s); position: absolute; left: 0; top: 12px; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .scope { display: grid; gap: 12px; grid-template-columns: 1fr; }
+  @media (min-width: 700px) { .scope { grid-template-columns: 1fr 1fr; } }
+  .scope ul { margin: 0; padding-left: 18px; }
+  .scope li { margin: 6px 0; }
+  .in h3 { color: var(--accent); }
+  .out h3 { color: var(--no); }
+  .out { background: var(--no-soft); border-color: transparent; }
+  .in { background: var(--accent-soft); border-color: transparent; }
+  .decisions .card { margin-bottom: 10px; border-left: 4px solid var(--warn); }
+  .decisions h3 { color: var(--warn); }
+  .quote {
+    background: var(--accent-soft); border-radius: 14px; padding: 22px; font-size: 18px; line-height: 1.5;
+  }
+  .quote strong { color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; }
+  .tablewrap { overflow-x: auto; }
+  footer { margin-top: 48px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 16px; }
+</style>
+</head>
+<body>
+<a href="index.html" class="home-btn" aria-label="Volver al inicio" style="position:fixed;top:12px;left:12px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:#16283B;color:#fff;font:600 14px/1 system-ui,-apple-system,'Segoe UI',Arial,sans-serif;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.35)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</a>
+<div class="wrap">
+
+<header>
+  <span class="tag">FORGE X · Fase 0</span>
+  <h1>Mi lectura de tu visión</h1>
+  <p class="lead">Después de analizar a fondo los caminos que te compartí, quiero explicarte a qué conclusión llegué sobre lo que realmente buscas construir, y cómo propongo aterrizarlo.</p>
+</header>
+
+<section>
+  <div class="quote">
+    <strong>Lo que entendí:</strong> quieres crear una agencia de software que entregue a cada negocio su ecosistema digital completo: una tienda en línea con catálogo y pago digital, más un asistente de WhatsApp que atienda a sus clientes, sin involucrarte en la logística de almacenamiento ni distribución.
+  </div>
+</section>
+
+<section>
+  <h2>Dónde ajusté el enfoque</h2>
+  <div class="shift">
+    <div class="card before">
+      <div class="label">Punto de partida</div>
+      <h3>Cobrar dentro de WhatsApp</h3>
+      <p>Usar el chat como canal de cobro y de cierre de la venta.</p>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card after">
+      <div class="label">Mi conclusión</div>
+      <h3>Ecosistema del negocio + asistente</h3>
+      <p>La tienda en línea resuelve catálogo y pago. WhatsApp se vuelve el asistente que orienta, filtra y responde.</p>
+    </div>
+  </div>
+  <p style="margin-top:14px;color:var(--muted)">Mi razonamiento: una tienda en línea ya te permite tener catálogo, compartir la URL de cada producto y cobrar de forma digital. Cobrar dentro de WhatsApp añadiría complejidad (costos por mensaje, riesgo en pagos, regulación) sin sumar lo que el cliente final realmente valora: que lo atiendan rápido y con claridad. Por eso creo que el valor de WhatsApp está en la atención, no en el cobro.</p>
+</section>
+
+<section>
+  <h2>Lo que te propongo construir: tres piezas</h2>
+  <div class="grid3">
+    <div class="card">
+      <div class="num">1</div>
+      <h3>Tienda web</h3>
+      <p>Página del negocio con su catálogo de productos o servicios y su información.</p>
+    </div>
+    <div class="card">
+      <div class="num">2</div>
+      <h3>Pago digital</h3>
+      <p>Pasarela de un proveedor externo, conectada a la cuenta del propio negocio.</p>
+    </div>
+    <div class="card">
+      <div class="num">3</div>
+      <h3>Asistente de WhatsApp</h3>
+      <p>Filtra el catálogo, resuelve dudas del proceso de compra y da información del negocio.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Cómo lo viviría el cliente final</h2>
+  <div class="card">
+    <ol class="flow">
+      <li><strong>Escribe por WhatsApp</strong> con una duda o buscando algo.</li>
+      <li><strong>El asistente lo orienta:</strong> filtra el catálogo según lo que necesita y responde preguntas puntuales (precios, tallas, horarios, formas de pago, etc.).</li>
+      <li><strong>Le comparte la URL del producto</strong> en la tienda en línea.</li>
+      <li><strong>El cliente paga en la web</strong> con la pasarela digital.</li>
+      <li><strong>El negocio atiende el pedido</strong> con su propia operación y logística.</li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <h2>Alcance que propongo</h2>
+  <div class="scope">
+    <div class="card in">
+      <h3>Sí incluiría</h3>
+      <ul>
+        <li>Tienda web con catálogo y pago digital</li>
+        <li>Asistente de WhatsApp para consultas y orientación de compra</li>
+        <li>Conexión entre el catálogo y el asistente</li>
+        <li>Configuración por negocio (marca, contenido, respuestas)</li>
+      </ul>
+    </div>
+    <div class="card out">
+      <h3>No incluiría</h3>
+      <ul>
+        <li>Almacenamiento ni inventario físico</li>
+        <li>Distribución o envíos</li>
+        <li>Una pasarela de pago construida desde cero</li>
+        <li>Manejar el dinero de los negocios</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top:14px;color:var(--muted)">Sobre la pasarela propia: recomiendo apoyarnos en un proveedor externo. Así no cargamos con el riesgo regulatorio ni con la responsabilidad del dinero de terceros, y el negocio recibe sus pagos directo en su cuenta.</p>
+</section>
+
+<section>
+  <h2>Cómo veo el modelo de agencia</h2>
+  <div class="card">
+    <p style="color:var(--ink)">Para que esto funcione como agencia y no como consultoría a la medida, la base técnica debe ser <strong>reutilizable</strong>: una tienda y un asistente configurables por negocio, donde solo se personalice contenido, marca y reglas de atención. Así cada nuevo cliente se entrega más rápido y con mejor margen.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Componente</th><th>Quién lo cubre</th></tr></thead>
+        <tbody>
+          <tr><td>Desarrollo y configuración del ecosistema</td><td>La agencia</td></tr>
+          <tr><td>Pasarela de pago</td><td>Proveedor externo, en cuenta del negocio</td></tr>
+          <tr><td>Número de WhatsApp y costo de mensajes</td><td>El negocio</td></tr>
+          <tr><td>Logística y entrega</td><td>El negocio</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="decisions">
+  <h2>Lo que necesito que me confirmes</h2>
+  <div class="card">
+    <h3>Cómo cobrarías el servicio</h3>
+    <p>¿Suscripción mensual por negocio, proyecto único con cobro de implementación, o una combinación? Esto define buena parte del diseño técnico y de la propuesta comercial.</p>
+  </div>
+  <div class="card">
+    <h3>Hasta dónde llega el asistente</h3>
+    <p>Qué debe resolver solo y cuándo pasa la conversación a una persona (reclamos, pedidos especiales).</p>
+  </div>
+  <div class="card">
+    <h3>Preguntas sobre el pedido</h3>
+    <p>Aunque no nos metamos en logística, el cliente preguntará "¿dónde está mi pedido?". Hay que decidir si el asistente lo responde o si queda fuera de alcance.</p>
+  </div>
+  <div class="card">
+    <h3>Facturación SAT</h3>
+    <p>Sé que es deseable después del pago. La dejaría como mejora futura y no en esta primera etapa.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Siguientes pasos</h2>
+  <div class="card">
+    <ol class="flow">
+      <li>Revisar contigo esta lectura y confirmar que refleja tu visión.</li>
+      <li>Resolver los puntos abiertos, empezando por el modelo de cobro.</li>
+      <li>Definir el alcance del primer negocio piloto.</li>
+      <li>Elegir el proveedor de pago y la arquitectura base reutilizable.</li>
+    </ol>
+  </div>
+</section>
+
+<footer>FORGE X · Análisis de fase 0 · Octubre 2026</footer>
+
+</div>
+</body>
+</html>
